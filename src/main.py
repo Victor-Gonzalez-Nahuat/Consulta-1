@@ -8,8 +8,7 @@ load_dotenv()
 
 API_URL = os.getenv("API_URL")
 
-#INARMA01 CENTRO
-#INARMA02 CBETIS
+#INARMA01
 
 def main(page: ft.Page):
     page.theme_mode = ft.ThemeMode.LIGHT
@@ -89,64 +88,33 @@ def main(page: ft.Page):
         try:
             res = requests.get(API_URL + codigo)
             if res.status_code == 200:
-                data_listas = res.json()
+                producto_data = res.json()
 
-                columnas_resultado = []
-                encontrado_al_menos_uno = False
-
-                # Iteración sobre los dos resultados
-                for indice, producto_data in enumerate(data_listas):
-
-                    nombre_tabla = indice
-                    color_fondo = ft.colors.BLUE_GREY_100 if indice == 0 else ft.colors.YELLOW_100
-
-                    # 1. Verificamos si el diccionario NO está vacío ({})
-                    if producto_data:
-                        encontrado_al_menos_uno = True
-
-                        # ... (Lógica para crear la tarjeta individual para este producto) ...
-                        tarjeta_producto = ft.Card(
-                            content=ft.Container(
-                                content=ft.Column([
-                                    ft.Text("CENTRO" if nombre_tabla == 0 else "CBTIS", size=16, weight=ft.FontWeight.BOLD,
-                                            color=ft.colors.BLACK, bgcolor=color_fondo),
-                                    ft.Divider(),
-                                    ft.Text(f"🛠 Nombre: {producto_data['nombre']}", size=20, weight=ft.FontWeight.BOLD),
-                                    ft.Text(f"🔢 Código: {producto_data['codigo']}"),
-                                    ft.Text(f"📚 Grupo: {producto_data['grupo']}"),
-                                    ft.Text(f"🔼 Máximo: {producto_data['maximo']}"),
-                                    ft.Text(f"🔽 Mínimo: {producto_data['minimo']}"),
-                                    ft.Text(f"💲 Precio: ${producto_data['precio']:.2f}"),
-                                    ft.Text(f"📦 Existencia: {producto_data['existencia']}"),
-                                    ft.Text(f"🧾 Último costo: ${producto_data['ultimo_costo']:.2f}"),
-                                    ft.Text(f"📅 Última venta: {formatear_fecha(producto_data['ultima_venta'])}"),
-                                    ft.Text(f"📅 Última compra: {formatear_fecha(producto_data['ultima_compra'])}"),
-                                    ft.Text(f"🏭 Proveedor: {producto_data['proveedor']}"),
-                                ]),
-                                padding=20,
-                            ),
-                            elevation=4,
-                            margin=10
-                        )
-                        columnas_resultado.append(tarjeta_producto)
-                    # Si no se encuentra, añadir mensaje (necesario para la lógica 'else' de abajo)
-                    else:
-                        columnas_resultado.append(
-                            ft.Text(f"⚠️ El código {codigo} NO se encontró en la tabla {nombre_tabla}.",
-                                    size=14, color=ft.colors.RED_700, margin=10)
-                        )
-
-                # *****************************************************************
-                # 👉 LÓGICA DE ASIGNACIÓN Y DIÁLOGO RESTAURADA AQUÍ:
-                # *****************************************************************
-                if encontrado_al_menos_uno:
-                    # Caso 1: Se encontró al menos 1 producto (Muestra las tarjetas/mensajes)
-                    resultado_card.content = ft.Column(columnas_resultado, scroll=ft.ScrollMode.AUTO)
+                if producto_data:
+                    tarjeta_producto = ft.Card(
+                        content=ft.Container(
+                            content=ft.Column([
+                                ft.Text(f"🛠 Nombre: {producto_data['nombre']}", size=20, weight=ft.FontWeight.BOLD),
+                                ft.Text(f"🔢 Código: {producto_data['codigo']}"),
+                                ft.Text(f"📚 Grupo: {producto_data['grupo']}"),
+                                ft.Text(f"🔼 Máximo: {producto_data['maximo']}"),
+                                ft.Text(f"🔽 Mínimo: {producto_data['minimo']}"),
+                                ft.Text(f"💲 Precio: ${producto_data['precio']:.2f}"),
+                                ft.Text(f"📦 Existencia: {producto_data['existencia']}"),
+                                ft.Text(f"🧾 Último costo: ${producto_data['ultimo_costo']:.2f}"),
+                                ft.Text(f"📅 Última venta: {formatear_fecha(producto_data['ultima_venta'])}"),
+                                ft.Text(f"📅 Última compra: {formatear_fecha(producto_data['ultima_compra'])}"),
+                                ft.Text(f"🏭 Proveedor: {producto_data['proveedor']}"),
+                            ]),
+                            padding=20,
+                        ),
+                        elevation=4,
+                        margin=10
+                    )
+                    resultado_card.content = ft.Column([tarjeta_producto], scroll=ft.ScrollMode.AUTO)
                 else:
-                    # Caso 2: No se encontró NINGÚN producto (resultado fue [{}, {}])
-                    resultado_card.content = ft.Text("❌ Producto no encontrado en ninguna tabla.", size=16)
+                    resultado_card.content = ft.Text("❌ Producto no encontrado.", size=16)
 
-                    # Diálogo de confirmación
                     confirmacion = ft.AlertDialog(title=ft.Text("Código no encontrado"),
                                                   content=ft.Column([
                                                       ft.Text("¿Desea buscar por nombre?"),
@@ -160,7 +128,6 @@ def main(page: ft.Page):
                                                   ], height=80),
                                                   )
                     page.open(confirmacion)
-                # *****************************************************************
 
             else:
                 # Manejo de error de la API (status_code != 200)
@@ -204,40 +171,17 @@ def main(page: ft.Page):
         try:
             res = requests.get(API_URL + f"nombre/{nombre}")
             if res.status_code == 200:
-                data_listas_productos = res.json()
-
-                todos_los_productos = []
-
-                for producto in data_listas_productos[0]:
-                    producto['origen'] = 'CENTRO'
-                    todos_los_productos.append(producto)
-
-                if len(data_listas_productos) > 1:
-                    for producto in data_listas_productos[1]:
-                        producto['origen'] = 'CBTIS'
-                        todos_los_productos.append(producto)
-
-                productos_ordenados = sorted(todos_los_productos, key=lambda p: p['nombre'])
+                productos = res.json() or []
+                productos_ordenados = sorted(productos, key=lambda p: p['nombre'])
 
                 columnas = []
 
                 for producto in productos_ordenados:
-                    tabla_tag = producto['origen']
-                    color_fondo = ft.Colors.ORANGE_800 if tabla_tag == "CENTRO" else ft.Colors.YELLOW_800
-
                     columnas.append(
                         ft.Container(
                             content=ft.Column([
                                 ft.Text(f"🛠 Nombre: {producto['nombre']}", size=18, weight=ft.FontWeight.BOLD),
                                 ft.Text(f"🔢 Código: {producto['codigo']}"),
-
-                                ft.Text(
-                                    tabla_tag,
-                                    size=24,
-                                    color=ft.Colors.WHITE,
-                                    bgcolor=color_fondo,
-                                    weight=ft.FontWeight.NORMAL,
-                                ),
                                 ft.ElevatedButton(
                                     "Seleccionar producto",
                                     icon=ft.icons.SELECT_ALL,
@@ -246,7 +190,6 @@ def main(page: ft.Page):
                                     height=40,
                                     bgcolor=ft.colors.GREEN,
                                     color=ft.colors.WHITE,
-                                    # Pasamos el código y el origen si es necesario en buscar_producto
                                     on_click=lambda e, c=producto['codigo']: buscar_producto(c)
                                 )
                             ]),
@@ -274,40 +217,17 @@ def main(page: ft.Page):
         try:
             res = requests.get(API_URL + f"nombre/{nombre}")
             if res.status_code == 200:
-                data_listas_productos = res.json()
-
-                todos_los_productos = []
-
-                for producto in data_listas_productos[0]:
-                    producto['origen'] = 'CENTRO'
-                    todos_los_productos.append(producto)
-
-                if len(data_listas_productos) > 1:
-                    for producto in data_listas_productos[1]:
-                        producto['origen'] = 'CBTIS'
-                        todos_los_productos.append(producto)
-
-                productos_ordenados = sorted(todos_los_productos, key=lambda p: p['nombre'])
+                productos = res.json() or []
+                productos_ordenados = sorted(productos, key=lambda p: p['nombre'])
 
                 columnas = []
 
                 for producto in productos_ordenados:
-                    tabla_tag = producto['origen']
-                    color_fondo = ft.Colors.ORANGE_800 if tabla_tag == "CENTRO" else ft.Colors.YELLOW_800
-
                     columnas.append(
                         ft.Container(
                             content=ft.Column([
                                 ft.Text(f"🛠 Nombre: {producto['nombre']}", size=18, weight=ft.FontWeight.BOLD),
                                 ft.Text(f"🔢 Código: {producto['codigo']}"),
-
-                                ft.Text(
-                                    tabla_tag,
-                                    size=24,
-                                    color=ft.Colors.WHITE,
-                                    bgcolor=color_fondo,
-                                    weight=ft.FontWeight.NORMAL,
-                                ),
                                 ft.ElevatedButton(
                                     "Seleccionar producto",
                                     icon=ft.icons.SELECT_ALL,
@@ -316,7 +236,6 @@ def main(page: ft.Page):
                                     height=40,
                                     bgcolor=ft.colors.GREEN,
                                     color=ft.colors.WHITE,
-                                    # Pasamos el código y el origen si es necesario en buscar_producto
                                     on_click=lambda e, c=producto['codigo']: buscar_producto(c)
                                 )
                             ]),
