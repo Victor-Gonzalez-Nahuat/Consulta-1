@@ -20,7 +20,7 @@ def main(page: ft.Page):
     
 
     logo = ft.Image(
-    src="https://i.ibb.co/xSR9dKb7/falla-Motul.jpg",
+    src="https://imgs.search.brave.com/IX5-u1cy5OWm_WE9kty0Q1SDUwJzKUriwYx7614BXPE/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/cHJlbWl1bS12ZWN0/b3IvdmVjdG9yLWRl/c2lnbi1wb3MtdGVy/bWluYWwtaWNvbi1z/dHlsZV8xMjUwMDA2/LTM4OTc3LmpwZz9z/ZW10PWFpc19oeWJy/aWQmdz03NDA",
     width=60,
     height=60,
     fit=ft.ImageFit.CONTAIN
@@ -28,7 +28,7 @@ def main(page: ft.Page):
 
     titulo_empresa = ft.Column([
         ft.Text(
-        "REFACCIONARIA FALLA",
+        "Consulta Movil de Punto de Venta",
         size=26,
         weight=ft.FontWeight.BOLD,
         color=ft.colors.WHITE
@@ -60,7 +60,7 @@ def main(page: ft.Page):
     resultado_card = ft.Container(
         ft.Row([
             ft.Image(
-            src="https://i.ibb.co/xSR9dKb7/falla-Motul.jpg",
+            src="https://imgs.search.brave.com/IX5-u1cy5OWm_WE9kty0Q1SDUwJzKUriwYx7614BXPE/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/cHJlbWl1bS12ZWN0/b3IvdmVjdG9yLWRl/c2lnbi1wb3MtdGVy/bWluYWwtaWNvbi1z/dHlsZV8xMjUwMDA2/LTM4OTc3LmpwZz9z/ZW10PWFpc19oeWJy/aWQmdz03NDA",
             width=250,
             height=250,
             fit=ft.ImageFit.CONTAIN
