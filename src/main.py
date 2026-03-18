@@ -71,15 +71,20 @@ def main(page: ft.Page):
         if not fecha_str:
             return "Fecha no válida"
         try:
-            fecha = datetime.strptime(str(fecha_str), "%Y-%m-%d %H:%M:%S")
+            fecha_limpia = str(fecha_str).replace("Z", "+00:00")
+            fecha = datetime.fromisoformat(fecha_limpia)
             return fecha.strftime("%d/%m/%Y")
         except ValueError:
-            # Fallback por si la API envía solo fecha sin hora.
+            # Fallback para formatos no ISO.
             try:
-                fecha = datetime.strptime(str(fecha_str), "%Y-%m-%d")
+                fecha = datetime.strptime(str(fecha_str), "%Y-%m-%d %H:%M:%S")
                 return fecha.strftime("%d/%m/%Y")
             except ValueError:
-                return str(fecha_str)
+                try:
+                    fecha = datetime.strptime(str(fecha_str), "%Y-%m-%d")
+                    return fecha.strftime("%d/%m/%Y")
+                except ValueError:
+                    return str(fecha_str)
         except Exception:
             return "Fecha inválida"
 
