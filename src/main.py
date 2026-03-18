@@ -28,13 +28,13 @@ def main(page: ft.Page):
 
     titulo_empresa = ft.Column([
         ft.Text(
-        "Consulta Movil de Punto de Venta",
+        "Consulta Movil",
         size=26,
         weight=ft.FontWeight.BOLD,
         color=ft.colors.WHITE
     ),
     ft.Text(
-        "Motul",
+        "Punto de Venta",
         size=26,
         weight=ft.FontWeight.BOLD,
         color=ft.colors.WHITE
