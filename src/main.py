@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 import flet as ft
 import requests
@@ -67,15 +68,19 @@ def main(page: ft.Page):
         ], alignment=ft.MainAxisAlignment.CENTER))
 
     def formatear_fecha(fecha_str):
-        if not fecha_str or len(fecha_str) != 6:
+        if not fecha_str:
             return "Fecha no válida"
         try:
-            anio = int(fecha_str[:2])
-            mes = int(fecha_str[2:4])
-            dia = int(fecha_str[4:])
-            anio += 2000
-            return f"{dia:02d}/{mes:02d}/{anio}"
-        except:
+            fecha = datetime.strptime(str(fecha_str), "%Y-%m-%d %H:%M:%S")
+            return fecha.strftime("%d/%m/%Y")
+        except ValueError:
+            # Fallback por si la API envía solo fecha sin hora.
+            try:
+                fecha = datetime.strptime(str(fecha_str), "%Y-%m-%d")
+                return fecha.strftime("%d/%m/%Y")
+            except ValueError:
+                return str(fecha_str)
+        except Exception:
             return "Fecha inválida"
 
     def buscar_producto(codigo):
